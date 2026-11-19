@@ -105,3 +105,25 @@ dates, flows = load_streamflow(
 plot_streamflow(dates, flows, sites)
 # values for gauge 10163000: max= 131, avg = 56.95
 summarize(dates, flows, sites)
+
+def threshold_report(flows, sites):
+    """Report hours each gauge exceeded a user-entered flow threshold."""
+
+    # Ask the user to enter a threshold in cubic feet per second
+    threshold = float(input("Enter a flow threshold (cfs): "))
+
+    print("\nHours above threshold:")
+
+    # Check each monitoring station
+    for i in range(len(sites)):
+
+        # Compare each flow reading with the threshold
+        above = flows[:, i] > threshold
+
+        # Count readings above the threshold and convert to hours
+        hours = np.sum(above) * 0.25
+
+        # Print results for this gauge
+        print(f"Gauge {sites[i]}: {hours:.2f} hours")
+
+threshold_report(flows, sites)
