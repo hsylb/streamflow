@@ -70,7 +70,7 @@ def summarize(dates, flows, sites):
         file.write("Gauge,Max (cfs),Date of Max,Min (cfs),Avg (cfs)\n")
 
         # print table headings in the terminal
-        print(f"{'Gauge':<12}{'Max (cfs):>12'}"
+        print(f"{'Gauge':<12}{'Max (cfs)':>12}"
               f"{'Date of Max':>20}{'Min (cfs)':>12}{'Avg (cfs)':>12}")
 
        # calculate statistics for each monitoring station
