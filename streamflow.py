@@ -93,7 +93,8 @@ def summarize(dates, flows, sites):
             file.write(f"{sites[i]},{max_flow:.1f},{max_date},"
                        f"{min_flow:.1f},{avg_flow:.1f}\n"
                        )
-            
+
+# The main program calls the functions to load, plot, and summarize the streamflow data. 
 # Main program
 sites = ["10163000", "10155200", "10155500",
          "10154200", "10155000"]
