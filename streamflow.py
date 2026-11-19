@@ -60,6 +60,40 @@ def plot_streamflow(dates, flows, sites):
     plt.savefig("provo_streamflow.png", dpi=150, bbox_inches='tight')
     plt.show()
 
+def summarize(dates, flows, sites):
+    """Calculate streamflow statistics and save a CSV report."""
+
+    # create the CSV file
+    with open("streamflow_summary.csv", "w") as file:
+
+        # write column headings to the CSV
+        file.write("Gauge,Max (cfs),Date of Max,Min (cfs),Avg (cfs)\n")
+
+        # print table headings in the terminal
+        print(f"{'Gauge':<12}{'Max (cfs):>12'}"
+              f"{'Date of Max':>20}{'Min (cfs)':>12}{'Avg (cfs)':>12}")
+
+       # calculate statistics for each monitoring station
+        for i in range(len(sites)):
+            values = flows[:, i]
+
+            max_flow = np.max(values)
+            min_flow = np.min(values)
+            avg_flow = np.mean(values)
+
+            # find when the maximum flow occurred
+            max_index = np.argmax(values)
+            max_date = dates[max_index].strftime('%Y-%m-%d %H:%M')
+
+            # display results in the terminal
+            print(f"{sites[i]:<12}{max_flow:>12.2f}"
+                  f"{max_date:>20}{min_flow:>12.2f}{avg_flow:>12.2f}")
+
+            # save results to the CSV
+            file.write(f"{sites[i]},{max_flow:.1f},{max_date},"
+                       f"{min_flow:.1f},{avg_flow:.1f}\n"
+                       )
+            
 # Main program
 sites = ["10163000", "10155200", "10155500",
          "10154200", "10155000"]
@@ -69,3 +103,5 @@ dates, flows = load_streamflow(
     )
 
 plot_streamflow(dates, flows, sites)
+# values for gauge 10163000: max= 131, avg = 56.95
+summarize(dates, flows, sites)
