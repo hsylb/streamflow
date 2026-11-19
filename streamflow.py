@@ -1,52 +1,71 @@
 # -*- coding: utf-8 -*-
 
 import matplotlib.pyplot as plt
-import numpy as np
-
-
-# load Provo River streamflow data
-data = np.genfromtxt(
-    'June-2021-Provo-River-Streamflow-Rates.csv',
-    delimiter=',',
-    dtype=str,
-    skip_header=1
-) # commas separate the columns, and the first row is skipped
-
-# slice the array into columns
-x = data[:, 0] # select the date column for the x-axis
-# each additional column represents water flow measured at a different monitoring site; converts the values to floats so they can be graphed
-y_1 = data[:, 1].astype(float)
-y_2 = data[:, 2].astype(float)
-y_3 = data[:, 3].astype(float)
-y_4 = data[:, 4].astype(float)
-y_5 = data[:, 5].astype(float)
-
 import matplotlib.dates as mdates
+import numpy as np
 import datetime as dt
 
-# convert date strings into datetime objects
-dates = [dt.datetime.strptime(d.strip(), '%Y-%m-%d %H:%M:%S') for d in x] # this CSV includes a time such as 00:00:00 so this needs to be converted to hour, minute, seconds
+# Function 1:load and organize Provo River streamflow data
+def load_streamflow(filename):
+    """Read the streamflow CSV and return dates and flow values."""
 
-plt.figure(figsize=(8, 5)) # create an 8in by 5in figure
+    # load Provo River streamflow data
+    data = np.genfromtxt(
+        filename,
+        delimiter=',',
+        dtype=str,
+        skip_header=1
+    ) 
 
-# plot the flowrate of each monitoring site, each site is drawn as a separate line; labels allow us to identify sites in the legend
-plt.plot(dates, y_1, label='10163000')
-plt.plot(dates, y_2, label='10155200')
-plt.plot(dates, y_3, label='10155500')
-plt.plot(dates, y_4, label='10154200')
-plt.plot(dates, y_5, label='10155000')
+    # slice the array into columns
+    x = data[:, 0] 
 
-plt.title('Provo River Streamflow Data (2021)') # add a graph title describing the dataset
-plt.xlabel('Date') # label the horizontal axis with dates
-plt.ylabel('Flowrate (cfs)') # label the vertical axis with the measurement units with cfs standing for cubic feet per second
+    # convert date strings into datetime objects
+    dates = [
+        dt.datetime.strptime(d.strip(), '%Y-%m-%d %H:%M:%S') 
+        for d in x
+    ]
 
-plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=4)) # place major x-axis tick marks every four days
-plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d')) # display dates in year-month-day format
+    # select all five flow columns and convert to numbers
+    flows = data[:, 1:6].astype(float)
 
-plt.legend(title='Site Numbers') # create a legend with the title "Site Numbers"
-plt.grid(True) # add gridlines for comparing flowrates
+    return dates, flows
 
-plt.xticks(rotation=45) # rotate date labels 45 degrees to prevent overlap
+# Function 2: plot the streamflow data
+def plot_streamflow(dates, flows, sites):
+    """Plot the flow at each gauge."""
 
-plt.tight_layout() # adjust spacing and display the graph
-plt.show()
+    plt.figure(figsize=(8, 5)) 
+
+    # plot each monitoring site
+    for i in range(len(sites)):
+        plt.plot(dates, flows[:, i], label=sites[i])
+
+    plt.title('Provo River Streamflow Data (2021)') 
+    plt.xlabel('Date') 
+    plt.ylabel('Flowrate (cfs)') 
+
+    # format the dates on the x-axis 
+    plt.gca().xaxis.set_major_locator(
+        mdates.DayLocator(interval=4)
+        )
+    plt.gca().xaxis.set_major_formatter(
+        mdates.DateFormatter('%Y-%m-%d')
+        ) # display dates in year-month-day format
+
+    plt.legend(title='Site Numbers') 
+    plt.grid(True)
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.savefig("provo_streamflow.png", dpi=150, bbox_inches='tight')
+    plt.show()
+
+# Main program
+sites = ["10163000", "10155200", "10155500",
+         "10154200", "10155000"]
+
+dates, flows = load_streamflow(
+    "June-2021-Provo-River-Streamflow-Rates.csv"
+    )
+
+plot_streamflow(dates, flows, sites)
